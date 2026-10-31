@@ -72,6 +72,16 @@ The 10-minute timer is a FreeRTOS software timer. When it expires, its callback 
 
 **Why an RTOS:** the system has to keep time, sound the buzzer, run a 10-minute timer, watch the button, and send Wi-Fi notifications at the same time, and it must respond to the patient without delay. With an RTOS, each of these runs as a separate task with its own priority, so one task does not disturb another's timing. The button and alarm tasks have the highest priority, so pressing the button silences the buzzer immediately. FreeRTOS timers, queues, and mutexes pass missed-dose notifications between tasks and protect the dose log.
 
+## Build and Flash
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/) and the [PlatformIO](https://platformio.org/) extension.
+2. Clone the repository and open the `Med-Alert` folder in VS Code.
+3. Copy `include/secrets.example.h` to `include/secrets.h` and fill in your Wi-Fi name, Wi-Fi password, and ntfy topic URL. Do not commit this file.
+4. Set the dose time and timeout in `include/config.h` if you want something other than 8:00 AM.
+5. Build the project with the PlatformIO checkmark button, or run `pio run` in the terminal.
+6. Connect the ESP32 with USB, then click the PlatformIO upload button, or run `pio run -t upload`.
+7. Open the serial monitor at 115200 baud, or run `pio device monitor`, to see messages such as "Wi-Fi connected" and "Dose due."
+
 ## Project Status
 
 - Problem statement, hardware design, and RTOS task design are complete (Checkpoint 1).
