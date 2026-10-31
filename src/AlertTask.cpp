@@ -1,3 +1,4 @@
+// Sends the missed-dose notification
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include "tasks.h"
@@ -6,8 +7,10 @@
 void AlertTask(void *pvParameters) {
   bool missed;
   for (;;) {
+    // wait for a missed dose
     xQueueReceive(missedQueue, &missed, portMAX_DELAY);
 
+    // send the notification to ntfy
     WiFiClientSecure client;
     client.setInsecure();
     HTTPClient http;

@@ -1,3 +1,4 @@
+// Shared objects and task functions
 #ifndef TASKS_H
 #define TASKS_H
 
@@ -8,7 +9,6 @@
 #include "freertos/queue.h"
 #include "freertos/timers.h"
 
-// Shared objects, created in main.cpp
 extern SemaphoreHandle_t confirmSemaphore;
 extern QueueHandle_t missedQueue;
 extern TimerHandle_t timeoutTimer;

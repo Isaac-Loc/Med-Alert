@@ -1,7 +1,8 @@
+// Handles the button press
 #include "tasks.h"
 #include "config.h"
 
-// Runs when the button is pressed (falling edge)
+// runs when the button is pressed
 void IRAM_ATTR buttonISR() {
   BaseType_t woken = pdFALSE;
   xSemaphoreGiveFromISR(confirmSemaphore, &woken);
@@ -10,9 +11,14 @@ void IRAM_ATTR buttonISR() {
 
 void ConfirmTask(void *pvParameters) {
   for (;;) {
+    // wait for the button
     xSemaphoreTake(confirmSemaphore, portMAX_DELAY);
+
+    // turn off the LED and buzzer
     digitalWrite(LED_PIN, LOW);
     digitalWrite(BUZZER_PIN, LOW);
+
+    // stop the 10-minute timer
     xTimerStop(timeoutTimer, 0);
     Serial.println("Dose confirmed");
   }
