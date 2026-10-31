@@ -31,32 +31,44 @@ Med-Alert fixes this with a dedicated device:
 
 Final assembly is soldered onto perfboard. A breadboard is used during prototyping.
 
+## Pinout
+
+![ESP32 30-pin development board pinout](docs/esp32-pinout.png)
+
+| Signal | GPIO | Connection |
+| --- | --- | --- |
+| LED | GPIO16 | Through a resistor to LED |
+| Buzzer | GPIO17 | Drives the buzzer through the transistor |
+| Button | GPIO4 | Button to GND, using the internal pull-up |
+
 ## Bill of Materials
 
 | Item | Purpose | Price | Status |
 | --- | --- | --- | --- |
-| ESP32 Dev Board | Microcontroller with Wi-Fi | $8.99 | Order placed |
-| Electronics Fun Kit (buzzer, LED, button, transistor, resistors) | Alerts, dose confirmation, and protection components | $9.99 | Order placed |
+| [ESP32 Dev Board](https://www.amazon.com/dp/B0DF2YJSHN) | Microcontroller with Wi-Fi | $8.99 | Order placed |
+| [Electronics Fun Kit](https://www.amazon.com/dp/B01ERP6WL4) (buzzer, LED, button, transistor, resistors) | Alerts, dose confirmation, and protection components | $9.99 | Order placed |
 | Perfboard / solderable breadboard | Soldered final assembly | n/a | Unconfirmed. Not essential to the build process now. Will be ordered later. |
 | **Total** | | **$18.98** | |
 
 ## Software and Development Environment
 
-- **Visual Studio Code:** main code editor.
-- **PlatformIO:** VS Code extension used to build and flash the code.
-- **Arduino framework for ESP32:** provides the C++ API and includes FreeRTOS.
-- **GitHub:** shared repository for storing and managing the project code.
+- **[Visual Studio Code](https://code.visualstudio.com/):** main code editor.
+- **[PlatformIO](https://platformio.org/):** VS Code extension used to build and flash the code.
+- **[Arduino framework for ESP32](https://github.com/espressif/arduino-esp32):** provides the C++ API and includes FreeRTOS.
+- **[GitHub repository](https://github.com/Isaac-Loc/Med-Alert):** shared repository for storing and managing the project code.
 
 ## RTOS Design
 
-The project uses FreeRTOS, which ships with the Arduino ESP32 framework. No separate FreeRTOS installation is needed. PlatformIO downloads the framework, and FreeRTOS comes with it.
+The project uses [FreeRTOS](https://www.freertos.org/), which ships with the Arduino ESP32 framework. No separate FreeRTOS installation is needed. PlatformIO downloads the framework, and FreeRTOS comes with it.
 
 | Task | Priority | Function |
 | --- | --- | --- |
-| ConfirmTask | High (implement first or second) | Fires an interrupt when the button is pressed. Stops the alarm and logs the dose. |
-| AlertTask | High (implement first or second) | Checks the clock against the scheduled times. Starts the buzzer and LED when a dose is due. |
-| ReminderTask | Mid (after ReminderTask and ConfirmTask work) | Handles the missed-dose path. When the 10-minute countdown reaches 0, it sets a missed-dose flag and sends a notification to a device over Wi-Fi via ntfy.sh. |
-| TimeSyncTask | Mid (after ReminderTask and ConfirmTask work) | Syncs the clock with an internet time source so it stays correct. |
+| ConfirmTask | 3 (highest) | Button interrupt gives a semaphore that wakes the task. Turns off the LED and buzzer, stops the 10-minute timer, and logs the dose. |
+| ReminderTask | 2 | Checks the clock each second. At the scheduled time, turns on the LED and buzzer and starts the 10-minute timer. |
+| AlertTask | 1 | Waits on the missed-dose queue and sends the missed-dose notification to a device over Wi-Fi via [ntfy.sh](https://ntfy.sh/). |
+| TimeSyncTask | 1 | Syncs the clock from an internet time source (NTP) every hour. |
+
+The 10-minute timer is a FreeRTOS software timer. When it expires, its callback puts a message on the missed-dose queue for AlertTask.
 
 **Why an RTOS:** the system has to keep time, sound the buzzer, run a 10-minute timer, watch the button, and send Wi-Fi notifications at the same time, and it must respond to the patient without delay. With an RTOS, each of these runs as a separate task with its own priority, so one task does not disturb another's timing. The button and alarm tasks have the highest priority, so pressing the button silences the buzzer immediately. FreeRTOS timers, queues, and mutexes pass missed-dose notifications between tasks and protect the dose log.
 
