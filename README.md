@@ -78,11 +78,11 @@ Parts: ESP32 dev board, breadboard, jumper wires, LED, 220 Ω resistor (LED), ab
 
 1. Place the ESP32 in the middle of the breadboard. Connect its GND pin to the breadboard's negative rail.
 2. **LED:** Connect GPIO16 to one leg of the 220 Ω resistor. Connect the other leg to the LED's long leg (anode). Connect the LED's short leg (cathode) to GND.
-3. **Buzzer:** Connect the buzzer's positive leg to the ESP32's 5V pin. Connect its negative leg to the transistor's collector.
+3. **Buzzer:** Connect the buzzer's positive leg to the ESP32's 3.3V pin. Connect its negative leg to the transistor's collector.
 4. **Transistor:** Connect the emitter to GND. Connect GPIO17 to the base through the 1 kΩ resistor. Check the pin order against your transistor's datasheet.
 5. **Button:** Connect one side to GPIO4 and the other side to GND. Do not connect it to 5V. The code uses the internal pull-up, so no extra resistor is needed.
 
-Only the buzzer runs from the 5V pin. The LED and button are controlled by GPIO pins, which run at 3.3V, so do not send 5V into them.
+Only the buzzer runs from the 3.3V pin. The LED and button are controlled by GPIO pins, which run at 3.3V, so do not send 5V into them.
 
 ## Build and Flash
 
