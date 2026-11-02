@@ -12,7 +12,9 @@ TimerHandle_t timeoutTimer;
 void setup() {
   Serial.begin(115200);
   pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
   pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(BUZZER_PIN, LOW);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   // connect to the wifi

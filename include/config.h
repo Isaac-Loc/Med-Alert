@@ -17,6 +17,6 @@
 // time settings
 #define NTP_SERVER "pool.ntp.org"
 #define GMT_OFFSET_SEC (-5 * 3600)
-#define DAYLIGHT_OFFSET_SEC 3600
+#define DAYLIGHT_OFFSET_SEC 0
 
 #endif
